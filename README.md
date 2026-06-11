@@ -1,157 +1,97 @@
-# DotsBoxes (Maven)
-
-Ce projet est un support de TP pour le jeu **Dots and Boxes (Points et Cases)**.
-
-## Informations du groupe (a completer)
-
-Travail de groupe : **4 etudiants par groupe**.
-
-Remplir cette section avant le rendu :
-
-- Groupe : `G1`
-- Etudiant 1 (Nom Prenom) : `Cobos Fernandez Eduardo`
-- Etudiant 2 (Nom Prenom) : `Rakotonirina Jeremy`
-
-## 1. Pre-requis
-
+# Dots and Boxes — IA de jeu (Minimax, Alpha-Beta, MCTS, Expert)
+ 
+Implémentation en Java du jeu **Dots and Boxes** (Petits Carrés / Pousse-Pion), avec un accent sur l'**intelligence artificielle de jeu** : recherche adversariale, recherche arborescente Monte-Carlo, et une stratégie experte fondée sur la théorie des chaînes.
+ 
+## Présentation
+ 
+Dots and Boxes est un jeu combinatoire à information parfaite : deux joueurs tracent à tour de rôle un segment sur une grille de points. Fermer le 4ᵉ côté d'une case rapporte un point et donne un coup supplémentaire au joueur. Malgré des règles très simples, le jeu cache une combinatoire redoutable (théorie des chaînes, sacrifices, doubles-croix), ce qui en fait un terrain d'expérimentation classique en intelligence artificielle de jeu.
+ 
+Ce projet implémente le moteur de jeu complet ainsi que plusieurs stratégies d'IA, des plus simples (aléatoire, gloutonne) aux plus avancées (Minimax, Alpha-Beta, Monte Carlo Tree Search, et une stratégie experte hybride).
+ 
+## Prérequis & Installation
+ 
+**Prérequis :**
 - Java 17
 - Maven 3.8+
-- Un IDE Java (IntelliJ IDEA, VS Code + Extension Pack Java, Eclipse)
-
-Verifier votre environnement :
-
+- Un IDE Java (IntelliJ IDEA, VS Code + Extension Pack Java, Eclipse) — optionnel mais recommandé
+Vérifier l'environnement :
+ 
 ```bash
 java -version
 mvn -version
 ```
-
-## 2. Ouvrir le projet
-
-### Option A - IntelliJ IDEA
-
-1. `File > Open` puis selectionner le dossier du projet.
-2. Ouvrir `pom.xml` comme projet Maven si demande.
-3. Attendre l'import des dependances.
-
-### Option B - Terminal
-
+ 
+**Cloner le dépôt :**
+ 
 ```bash
-cd ./DotsBoxes
+git clone https://github.com/educob23/SAI_Project.git
+cd SAI_Project
 ```
-
-## 3. Compiler le projet
-
+ 
+**Ouvrir le projet :**
+ 
+- *Avec IntelliJ IDEA (recommandé)* : `File > Open`, sélectionner le dossier du projet. Ouvrir `pom.xml` comme projet Maven si demandé, puis attendre l'import des dépendances.
+- *Avec VS Code* : ouvrir le dossier avec l'Extension Pack Java installé — le projet Maven est détecté automatiquement.
+**Compiler le projet :**
+ 
 ```bash
 mvn clean compile
 ```
-
-## 4. Comprendre la structure avec la Javadoc
-
-La Javadoc est le point d'entree pour comprendre l'architecture (packages, classes, responsabilites, API publiques).
-
-Generer la Javadoc :
-
+ 
+## Stratégies d'IA implémentées
+ 
+| Stratégie | Description |
+|---|---|
+| **Random / Glouton / FirstValid** | Stratégies de référence (baselines) pour évaluer les IA plus avancées |
+| **Minimax** | Recherche à profondeur limitée avec une heuristique personnalisée évaluant les chaînes de cases et les sacrifices |
+| **Alpha-Beta** | Minimax avec élagage alpha-beta, instrumenté via des observateurs comptant les nœuds visités et les coupes effectuées |
+| **MCTS** | Monte Carlo Tree Search (sélection UCT, expansion, simulation aléatoire, rétropropagation), règle de rejeu respectée |
+| **Expert** | Stratégie hybride basée sur la théorie des chaînes : capture immédiate → coup sûr → sacrifice de chaîne minimal, avec bascule entre mode glouton (grandes grilles, O(N)) et Alpha-Beta à approfondissement itératif (petites/moyennes grilles) |
+ 
+Toutes les stratégies tiennent compte de la règle de rejeu : un joueur qui ferme une case rejoue immédiatement.
+ 
+## Outil de comparaison
+ 
+Le projet inclut un framework de benchmarking (`Comparaison`, `ComparaisonExpert`, `ComparaisonMcts`, `ComparaisonMinimaxAlphaBeta`) qui fait s'affronter deux stratégies sur N parties, en alternant qui commence pour garantir l'équité, et rapporte le taux de victoire et la marge moyenne.
+ 
 ```bash
-mvn javadoc:javadoc
+java -cp target/classes DotsBoxes.Comparaison 4 4 100 random glouton
 ```
-
-La documentation est generee dans :
-
-- `target/site/apidocs/index.html`
-
-Ouvrir ce fichier dans un navigateur.
-
-Demarche recommandee :
-
-1. Lire les packages principaux.
-2. Identifier les classes centrales (`Board`, `Action`, `Referee`, `DotsBoxesGame`).
-3. Lire les signatures publiques avant d'implementer.
-
-## 5. Tests unitaires et demarche TDD
-
-L'idee est d'avancer en petites etapes :
-
-1. Ecrire ou choisir un test qui decrit le comportement attendu.
-2. Lancer le test (il echoue).
-3. Ecrire le minimum de code pour le faire passer.
-4. Refactoriser sans casser les tests.
-
-Lancer tous les tests :
-
-```bash
-mvn test
+ 
+## Interfaces
+ 
+- **Texte** : `DotsBoxes.DotsBoxesGame`
+- **Graphique (Swing)** : `DotsBoxes.ui.DotsBoxesSwingUI`
+Lancer ces classes directement depuis l'IDE.
+ 
+## Architecture
+ 
 ```
-
-Lancer un test precis :
-
-```bash
-mvn -Dtest=NomDeLaClasseTest test
+src/main/java/DotsBoxes/
+├── board/        # Plateau, actions, règles du jeu
+├── observers/    # Comptage de nœuds, coupes alpha-beta
+├── player/
+│   ├── ai/       # Minimax, Alpha-Beta, MCTS, Expert
+│   ├── automate/ # Stratégies simples (random, glouton...)
+│   └── human/    # Joueur humain
+├── referee/      # Arbitre / moteur de partie
+└── ui/           # Interfaces texte et Swing
 ```
-
-### Lancer les tests depuis l'IDE
-
-#### IntelliJ IDEA
-
-1. Ouvrir le panneau `Maven` (a droite).
-2. Dans `Lifecycle`, lancer `test` (double clic).
-3. Pour un test unique : ouvrir une classe de test dans `src/test/java`, puis cliquer sur l'icone `Run` a cote de la classe ou de la methode.
-
-#### VS Code (Extension Pack Java)
-
-1. Ouvrir la vue `Testing`.
-2. Lancer tous les tests (bouton global) ou un test/classe specifique.
-3. Utiliser le terminal integre si besoin :
-
+ 
+## Tests
+ 
+Le projet utilise JUnit 5 et Mockito.
+ 
 ```bash
 mvn test
 ```
-
-## 6. Interface pour jouer au jeu
-
-Vous pouvez jouer de deux manieres :
-
-1. Interface texte via la classe principale `DotsBoxes.DotsBoxesGame`.
-2. Interface graphique Swing via `DotsBoxes.ui.DotsBoxesSwingUI`.
-
-Execution conseillee : lancer ces classes directement depuis l'IDE.
-
-## 7. Structure utile du projet
-
-- `src/main/java` : code source principal
-- `src/test/java` : tests unitaires
-- `pom.xml` : configuration Maven
-
-## 8. Commandes utiles pendant le TP
-
-Compiler rapidement sans tests :
-
-```bash
-mvn -DskipTests compile
-```
-
-Lancer un test precis :
-
-```bash
-mvn -Dtest=MinimaxActionStrategyTest test
-```
-
-Nettoyer les builds :
-
-```bash
-mvn clean
-```
-
-## 9. Problemes frequents
-
-- **`java: release version 17 not supported`**
-  - Votre JDK actif n'est pas Java 17.
-- **Dependances Maven non telechargees**
-  - Verifier la connexion reseau, puis relancer `mvn clean compile`.
-
-## 10. Conseils de travail
-
-- Consulter la Javadoc avant d'ecrire le code.
-- Avancer test par test (TDD).
-- Compiler souvent (`mvn compile`).
-- Lancer les tests regulierement (`mvn test`).
-- Committer par petites etapes.
+ 
+## Documentation
+ 
+- Javadoc générée via `mvn javadoc:javadoc` (sortie dans `target/site/apidocs/index.html`)
+- Rapport détaillé : [Rapport_SAI.pdf](Rapport_SAI.pdf)
+## Auteurs
+ 
+- Eduardo Cobos Fernandez
+- Jeremy Rakotonirina
+ 
