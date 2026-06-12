@@ -24,8 +24,8 @@ mvn -version
 **Cloner le dépôt :**
  
 ```bash
-git clone https://github.com/educob23/SAI_Project.git
-cd SAI_Project
+git clone https://github.com/educob23/DotsAndBoxes_AI.git
+cd DotsAndBoxes_AI
 ```
  
 **Ouvrir le projet :**
@@ -89,7 +89,7 @@ mvn test
 ## Documentation
  
 - Javadoc générée via `mvn javadoc:javadoc` (sortie dans `target/site/apidocs/index.html`)
-- Rapport détaillé : [Rapport_SAI.pdf](Rapport_SAI.pdf)
+- Rapport détaillé : [Rapport_Pipopipette.pdf](Rapport_Pipopipette.pdf)
 ## Auteurs
  
 - Eduardo Cobos Fernandez
